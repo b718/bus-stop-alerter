@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import MapView from "react-native-maps";
 import * as Location from "expo-location";
-import { getUserCurrentLocation } from "@/utilities/user-location-utilites";
+import { getUserCurrentLocation } from "@/utilities/user-location/user-location-utilites";
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  useEffect(() => {getUserCurrentLocation(setLocation)}, []);
+  const [location, setLocation] = useState<Location.LocationObject | null>(
+    null
+  );
+  useEffect(() => {
+    getUserCurrentLocation(setLocation);
+  }, []);
 
   return (
     <View style={styles.container}>
