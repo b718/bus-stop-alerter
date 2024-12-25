@@ -11,7 +11,7 @@ function createGeoSearchQuery(searchQuery: string): string {
   return `${query}&${key}&${language}&${pretty}&${limit}`;
 }
 
-async function fetchGeoSearchResults(searchQuery: string) {
+export async function fetchGeoSearchResults(searchQuery: string) {
   const query = createGeoSearchQuery(searchQuery);
   return fetch(`${endpoints.openCageEndpoint}${query}`).then((response) => response.json());
 }
