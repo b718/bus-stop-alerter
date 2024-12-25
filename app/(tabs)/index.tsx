@@ -1,74 +1,155 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Text, View, Button, Platform, Vibration, StyleSheet } from 'react-native';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
 
 export default function HomeScreen() {
+  const [isVibrating, setIsVibrating] = useState(false);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+
+    Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Call Notification',
+        body: 'This simulates a call-like vibration.',
+      },
+      trigger: {
+        seconds: 1,
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      },
+    });
+
+    const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
+      console.log('Received notification:', notification);
+      triggerCallVibration();
+    });
+
+    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+      console.log('Notification opened:', response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener);
+      Notifications.removeNotificationSubscription(responseListener);
+    };
+  }, []);
+
+  async function registerForPushNotificationsAsync() {
+    let token;
+    if (Device.isDevice) {
+      const { status: existingStatus } = await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
+        return;
+      }
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+      console.log(token);
+    } else {
+      alert('Must use physical device for Push Notifications');
+    }
+
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [1000, 1000], 
+        lightColor: '#FF231F7C',
+      });
+    }
+
+    return token;
+  }
+
+  const triggerCallVibration = () => {
+    const VIBRATION_INTERVAL = 500;
+
+    if (!isVibrating) {
+      intervalRef.current = setInterval(() => {
+        Vibration.vibrate(VIBRATION_INTERVAL);
+      }, VIBRATION_INTERVAL);
+      setIsVibrating(true);
+    }
+  };
+
+  const stopVibration = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      Vibration.cancel();
+      setIsVibrating(false);
+    }
+  };
+
+  
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
+        <Text style={[styles.header, styles.paragraph]}>Expo Push Notifications Demo</Text>
+        <Button
+          title="Send Local Notification"
+          onPress={async () => {
+            await Notifications.scheduleNotificationAsync({
+              content: {
+                title: 'Call Notification',
+                body: 'This simulates a call-like vibration.',
+              },
+              trigger: {
+                seconds: 1,
+                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+              },
+            });
+          }}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        <Separator />
+        <Button
+          title="Stop Vibration"
+          onPress={() => stopVibration()}
+          color="#FF0000"
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
+const Separator = () => {
+  return <View style={Platform.OS === 'android' ? styles.separator : null} />;
+};
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingTop: 44,
+    padding: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  header: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  paragraph: {
+    margin: 24,
+    textAlign: 'center',
+  },
+  separator: {
+    marginVertical: 8,
+    borderBottomColor: '#737373',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 });
