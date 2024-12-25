@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import React, { useContext, useEffect, useState } from "react";
+import { Image, StyleSheet, View } from "react-native";
+import MapView, { Marker, Circle } from "react-native-maps";
 import * as Location from "expo-location";
 import { getUserCurrentLocation } from "@/utilities/user-location/user-location-utilites";
 import SearchMenu from "@/components/SearchMenu";
@@ -19,7 +19,19 @@ export default function HomeScreen() {
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
-        <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}/>
+        <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}>
+          <Image 
+            source={require("../../assets/images/red_arrow.png")}
+            style={styles.markerImage}
+          />
+        </Marker>
+        <Circle
+            center = {constructLatLngFromDestinationLocation(destinationLocation)}
+            radius = { 500 } //This is the user hyperparameter that can be changed to make bigger radius
+            strokeWidth = { 1 }
+            strokeColor = { '#e205ff' }
+            fillColor = { 'rgba(239,176,247,0.5)' }
+        />
         <SearchMenu />
       </MapView>
     </View>
@@ -34,4 +46,8 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
+  markerImage: {
+    width: 50,
+    height: 50
+  }
 });
