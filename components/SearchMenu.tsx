@@ -14,7 +14,7 @@ const SearchMenu = () => {
         value={searchQuery}
         onChangeText={(newQuery) => setSearchQuery(newQuery)}
       />
-      <SearchQueryResults searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+      {searchQuery != "" && <SearchQueryResults searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>}
     </View>
   );
 };

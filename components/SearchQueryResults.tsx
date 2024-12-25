@@ -14,6 +14,10 @@ const ScreenWidth = Dimensions.get("window").width;
 const ERROR_CODE = 400;
 
 const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
+  if (queryResultData.results.length === 0) {
+    return <Text>No results found</Text>;
+  }
+
   return queryResultData.results.map(
     (openCageApiResponse: OpenCageApiResponse, index: number) => {
       return (
@@ -22,7 +26,7 @@ const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
           onPress={() => handlePress(openCageApiResponse)}
           style={styles.searchBarResultsItem}
         >
-          <Text key={index}>{openCageApiResponse.formatted}</Text>
+          <Text>{openCageApiResponse.formatted}</Text>
         </TouchableOpacity>
       );
     }
@@ -40,21 +44,24 @@ const SearchQueryResults:FunctionComponent<SearchQueryResultsProps> = ({searchQu
   };
 
   useEffect(() => {
-    setQueryResultData(data);
+    if (searchQuery != "") {
+      setQueryResultData(data);
+    } else {
+      setQueryResultData(undefined);
+    }
   }, [data]);
-
   
   return (
-    <View style={styles.searchBarResults}>
+    <>
       {queryResultData && queryResultData.status.code != ERROR_CODE ? (
-        <RenderSeachQueryResults
-          queryResultData={queryResultData}
-          handlePress={handlePress}
-        />
-      ) : (
-        <></>
-      )}
-    </View>
+        <View style={styles.searchBarResults}>
+          <RenderSeachQueryResults
+            queryResultData={queryResultData}
+            handlePress={handlePress}
+          />
+        </View>
+      ) : null}
+    </>
   );
 };
 
