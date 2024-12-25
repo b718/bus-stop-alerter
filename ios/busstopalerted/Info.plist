@@ -1,0 +1,10 @@
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>We need your location to set up geofencing</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>We need your location to monitor geofences in the background</string>
+<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+<string>We need your location to monitor geofences</string>
+<key>UIBackgroundModes</key>
+<array>
+    <string>location</string>
+</array>
