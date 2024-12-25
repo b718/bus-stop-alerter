@@ -1,129 +1,40 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Text, View, Button, Platform, Vibration, StyleSheet } from 'react-native';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: true,
-  }),
-});
+import { useContext, useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import MapView, { Marker } from "react-native-maps";
+import * as Location from "expo-location";
+import { calculateDistanceBetweenUserAndDestination, getUserCurrentLocation } from "@/utilities/user-location/user-location-utilites";
+import SearchMenu from "@/components/SearchMenu";
+import { DestinationLocationContext } from "../_layout";
+import { constructLatLngFromDestinationLocation } from "@/utilities/user-destination/user-destination-adapter";
 
 export default function HomeScreen() {
-  const [isVibrating, setIsVibrating] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
+  const { destinationLocation } = useContext(DestinationLocationContext);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const [inDestinationLocation, setInDestinationLocation] = useState<boolean>(false);
+  useEffect(() => {getUserCurrentLocation(setLocation)}, []);
   useEffect(() => {
-    registerForPushNotificationsAsync();
-
-    Notifications.scheduleNotificationAsync({
-      content: {
-        title: 'Call Notification',
-        body: 'This simulates a call-like vibration.',
-      },
-      trigger: {
-        seconds: 1,
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      },
-    });
-
-    const notificationListener = Notifications.addNotificationReceivedListener((notification) => {
-      console.log('Received notification:', notification);
-      triggerCallVibration();
-    });
-
-    const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
-      console.log('Notification opened:', response);
-    });
-
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener);
-      Notifications.removeNotificationSubscription(responseListener);
-    };
-  }, []);
-
-  async function registerForPushNotificationsAsync() {
-    let token;
-    if (Device.isDevice) {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync()).data;
-      console.log(token);
-    } else {
-      alert('Must use physical device for Push Notifications');
+    if (location && destinationLocation) {
+      const inDestinationLocation = 1000;
+      const inDestinationLocationRange = setInterval(() => {
+        if (calculateDistanceBetweenUserAndDestination(location, destinationLocation) < inDestinationLocation) {
+          setInDestinationLocation(true);
+        }
+      }, 1000);
+      return () => clearInterval(inDestinationLocationRange);
     }
+  }, [destinationLocation])
 
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [1000, 1000], 
-        lightColor: '#FF231F7C',
-      });
-    }
-
-    return token;
-  }
-
-  const triggerCallVibration = () => {
-    const VIBRATION_INTERVAL = 500;
-
-    if (!isVibrating) {
-      intervalRef.current = setInterval(() => {
-        Vibration.vibrate(VIBRATION_INTERVAL);
-      }, VIBRATION_INTERVAL);
-      setIsVibrating(true);
-    }
-  };
-
-  const stopVibration = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-      Vibration.cancel();
-      setIsVibrating(false);
-    }
-  };
-
-  
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
-        <Text style={[styles.header, styles.paragraph]}>Expo Push Notifications Demo</Text>
-        <Button
-          title="Send Local Notification"
-          onPress={async () => {
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: 'Call Notification',
-                body: 'This simulates a call-like vibration.',
-              },
-              trigger: {
-                seconds: 1,
-                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-              },
-            });
-          }}
-        />
-        <Separator />
-        <Button
-          title="Stop Vibration"
-          onPress={() => stopVibration()}
-          color="#FF0000"
-        />
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <View style={styles.container}>
+      <MapView
+        style={styles.map}
+        showsUserLocation={true}
+        showsMyLocationButton={true}
+      >
+        <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}/>
+        <SearchMenu />
+      </MapView>
+    </View>
   );
 }
 
@@ -151,5 +62,9 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     borderBottomColor: '#737373',
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  map: {
+    width: "100%",
+    height: "100%",
   },
 });
