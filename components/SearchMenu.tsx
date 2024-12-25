@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, Dimensions } from "react-native";
+import { View, StyleSheet, TextInput, Dimensions, Text } from "react-native";
 import SearchQueryResults from "./SearchQueryResults";
 
 const ScreenWidth = Dimensions.get("window").width;
@@ -11,10 +11,14 @@ const SearchMenu = () => {
       <TextInput
         style={styles.searchBar}
         placeholder={"Vancouver, BC"}
+        placeholderTextColor={"#ccc"}
         value={searchQuery}
         onChangeText={(newQuery) => setSearchQuery(newQuery)}
       />
-      {searchQuery != "" && <SearchQueryResults searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>}
+      <SearchQueryResults
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
     </View>
   );
 };

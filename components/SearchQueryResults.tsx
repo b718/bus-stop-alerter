@@ -36,7 +36,7 @@ const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
 };
 
 const SearchQueryResults:FunctionComponent<SearchQueryResultsProps> = ({searchQuery, setSearchQuery}) => {
-  const { destinationLocation, setDestinationLocation } = useContext(DestinationLocationContext);
+  const { setDestinationLocation } = useContext(DestinationLocationContext);
   const [queryResultData, setQueryResultData] = useState<any>(undefined);
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const handlePress = (openCageApiResponse: OpenCageApiResponse) => {

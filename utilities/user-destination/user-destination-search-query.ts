@@ -1,6 +1,5 @@
 import * as env from "@/data/env.json";
 import * as endpoints from "@/data/endpoints.json";
-import { useQuery } from '@tanstack/react-query';
 
 function createGeoSearchQuery(searchQuery: string): string {
   const limit = "limit=5";
@@ -12,12 +11,10 @@ function createGeoSearchQuery(searchQuery: string): string {
 }
 
 export async function fetchGeoSearchResults(searchQuery: string) {
+  if (!searchQuery) {
+    return;
+  }
+  
   const query = createGeoSearchQuery(searchQuery);
   return fetch(`${endpoints.openCageEndpoint}${query}`).then((response) => response.json());
 }
-
-export function useGeoSearchQuery(searchQuery: string) {
-  return useQuery({ queryKey: [searchQuery], queryFn: () => fetchGeoSearchResults(searchQuery)});
-}
-
-
