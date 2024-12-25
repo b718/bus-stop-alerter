@@ -1,16 +1,16 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { getUserCurrentLocation } from "@/utilities/user-location/user-location-utilites";
+import SearchMenu from "@/components/SearchMenu";
+import { DestinationLocationContext } from "../_layout";
+import { constructLatLngFromDestinationLocation } from "@/utilities/user-destination/user-destination-adapter";
 
 export default function HomeScreen() {
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
-  useEffect(() => {
-    getUserCurrentLocation(setLocation);
-  }, []);
+  const {destinationLocation, setDestinationLocation} = useContext(DestinationLocationContext);
+  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  useEffect(() => {getUserCurrentLocation(setLocation)}, []);
 
   return (
     <View style={styles.container}>
@@ -18,8 +18,10 @@ export default function HomeScreen() {
         style={styles.map}
         showsUserLocation={true}
         showsMyLocationButton={true}
-        followsUserLocation={true}
-      />
+      >
+        <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}/>
+        <SearchMenu />
+      </MapView>
     </View>
   );
 }

@@ -11,8 +11,9 @@ import { createContext, useEffect, useState } from "react";
 import "react-native-reanimated";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as Location from "expo-location";
+import ReactQueryProvider from "@/components/ReactQueryProvider";
 
-const DestinationLocationContext = createContext({
+export const DestinationLocationContext = createContext({
   destinationLocation: null as Location.LocationObject | null,
   setDestinationLocation: (location: Location.LocationObject) => {},
 });
@@ -38,14 +39,20 @@ export default function RootLayout() {
   }
 
   return (
-    <DestinationLocationContext.Provider value={{ destinationLocation, setDestinationLocation }}>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </DestinationLocationContext.Provider>
+    <ReactQueryProvider>
+      <DestinationLocationContext.Provider
+        value={{ destinationLocation, setDestinationLocation }}
+      >
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </DestinationLocationContext.Provider>
+    </ReactQueryProvider>
   );
 }
