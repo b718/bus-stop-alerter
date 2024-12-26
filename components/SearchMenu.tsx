@@ -25,8 +25,9 @@ const SearchMenu = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: "center",
+    position: 'absolute',
+    zIndex: 3,
+    width: ScreenWidth * 0.9,
   },
   searchBar: {
     maxWidth: ScreenWidth * 0.9,

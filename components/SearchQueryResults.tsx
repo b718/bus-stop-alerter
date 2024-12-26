@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: "#fff",
     maxHeight: 200,
+    zIndex: 3,
   },
   searchBarResultsItem: {
     borderWidth: 1,
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
     margin: 4,
     minWidth: ScreenWidth * 0.7,
     maxWidth: ScreenWidth * 0.7,
+    zIndex: 3,
   }
 });
 
