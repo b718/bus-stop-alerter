@@ -6,6 +6,7 @@ import { calculateDistanceBetweenUserAndDestination, getUserCurrentLocation } fr
 import SearchMenu from "@/components/SearchMenu";
 import { DestinationLocationContext } from "../_layout";
 import { constructLatLngFromDestinationLocation } from "@/utilities/user-destination/user-destination-adapter";
+import NotificationButton from "@/components/NotificationButton";
 
 export default function HomeScreen() {
   const { destinationLocation } = useContext(DestinationLocationContext);
@@ -33,14 +34,11 @@ export default function HomeScreen() {
       >
         <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}/>
         <SearchMenu />
+        <NotificationButton />
       </MapView>
     </View>
   );
 }
-
-const Separator = () => {
-  return <View style={Platform.OS === 'android' ? styles.separator : null} />;
-};
 
 const styles = StyleSheet.create({
   container: {
