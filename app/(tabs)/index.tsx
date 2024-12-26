@@ -27,13 +27,13 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <SearchMenu />
       <MapView
         style={styles.map}
         showsUserLocation={true}
         showsMyLocationButton={true}
       >
         <Marker coordinate={constructLatLngFromDestinationLocation(destinationLocation)}/>
-        <SearchMenu />
         <NotificationButton />
       </MapView>
     </View>
@@ -43,23 +43,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    paddingTop: 44,
-    padding: 8,
-  },
-  header: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  paragraph: {
-    margin: 24,
-    textAlign: 'center',
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: '#737373',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    alignItems: 'center',
   },
   map: {
     width: "100%",

@@ -66,8 +66,8 @@ export default function NotificationButton() {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
+      <SafeAreaView>
         <Button
           title="Send Local Notification"
           onPress={async () => {
@@ -105,8 +105,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 44,
     padding: 8,
+    maxHeight: 200
   },
   separator: {
     marginVertical: 8,
