@@ -23,7 +23,7 @@ export default function HomeScreen() {
   }, []);
   useEffect(() => {
     if (location && destinationLocation) {
-      const inDestinationLocation = 1000000;
+      const inDestinationLocation = 1000;
       const inDestinationLocationRange = setInterval(() => {
         if (
           calculateDistanceBetweenUserAndDestination(
