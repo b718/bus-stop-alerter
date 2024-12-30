@@ -1,28 +1,37 @@
 import { DestinationLocationContext } from "@/app/_layout";
 import { OpenCageApiResponse } from "@/types/open-cage-api";
 import { constructLocationObjectFromOpenCageAPI } from "@/utilities/user-destination/user-destination-adapter";
-import { useGeoSearchQuery } from "@/utilities/user-destination/user-destination-search-query";
+import { fetchGeoSearchResults } from "@/utilities/user-destination/user-destination-search-query";
 import React, { FunctionComponent, useContext, useEffect, useState } from "react";
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useDebounce } from "@uidotdev/usehooks";
+import {
+  widthPercentageToDP as screenWidthPercentage,
+  heightPercentageToDP as screenHeightPercentage,
+} from "react-native-responsive-screen";
 
 type SearchQueryResultsProps = {
   searchQuery: string;
   setSearchQuery: (searchQuery: string) => void;
 };
 
-const ScreenWidth = Dimensions.get("window").width;
 const ERROR_CODE = 400;
 
 const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
+  if (queryResultData.results.length === 0) {
+    return <Text>No results found</Text>;
+  }
+
   return queryResultData.results.map(
     (openCageApiResponse: OpenCageApiResponse, index: number) => {
       return (
         <TouchableOpacity
           key={index}
           onPress={() => handlePress(openCageApiResponse)}
-          style={styles.searchBarResultsItem}
         >
-          <Text key={index}>{openCageApiResponse.formatted}</Text>
+          <Text style={styles.searchBarResultsItem}>
+            {index + 1}. {openCageApiResponse.formatted}
+          </Text>
         </TouchableOpacity>
       );
     }
@@ -30,9 +39,9 @@ const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
 };
 
 const SearchQueryResults:FunctionComponent<SearchQueryResultsProps> = ({searchQuery, setSearchQuery}) => {
-  const { destinationLocation, setDestinationLocation } = useContext(DestinationLocationContext);
-  const { data, isLoading, isError } = useGeoSearchQuery(searchQuery);
+  const { setDestinationLocation } = useContext(DestinationLocationContext);
   const [queryResultData, setQueryResultData] = useState<any>(undefined);
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const handlePress = (openCageApiResponse: OpenCageApiResponse) => {
     setDestinationLocation(constructLocationObjectFromOpenCageAPI(openCageApiResponse));
     setQueryResultData(undefined);
@@ -40,42 +49,48 @@ const SearchQueryResults:FunctionComponent<SearchQueryResultsProps> = ({searchQu
   };
 
   useEffect(() => {
-    setQueryResultData(data);
-  }, [data]);
+    const fetchSearchQueryResults = async (debouncedSearchQuery: string) => {
+      const data = await fetchGeoSearchResults(debouncedSearchQuery);
+      setQueryResultData(data);
+    };
 
-  
+    fetchSearchQueryResults(debouncedSearchQuery);
+  }, [debouncedSearchQuery]);
+
   return (
-    <View style={styles.searchBarResults}>
+    <>
       {queryResultData && queryResultData.status.code != ERROR_CODE ? (
-        <RenderSeachQueryResults
-          queryResultData={queryResultData}
-          handlePress={handlePress}
-        />
-      ) : (
-        <></>
-      )}
-    </View>
+        <View style={styles.searchBarResults}>
+          <ScrollView>
+            <RenderSeachQueryResults
+              queryResultData={queryResultData}
+              handlePress={handlePress}
+            />
+          </ScrollView>
+        </View>
+      ) : null}
+    </>
   );
 };
 
 const styles = StyleSheet.create({
   searchBarResults: {
     alignItems: "center",
-    minWidth: ScreenWidth * 0.9,
-    maxWidth: ScreenWidth * 0.9,
+    minWidth: screenWidthPercentage("90%"),
+    maxWidth: screenWidthPercentage("90%"),
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 8,
     backgroundColor: "#fff",
+    maxHeight: screenHeightPercentage("25%"),
   },
   searchBarResultsItem: {
     borderWidth: 1,
     padding: 8,
-    borderRadius: 8,
     margin: 4,
-    minWidth: ScreenWidth * 0.7,
-    maxWidth: ScreenWidth * 0.7,
+    minWidth: screenWidthPercentage("80%"),
+    maxWidth: screenWidthPercentage("80%"),
   }
 });
 
