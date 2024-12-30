@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
-  Button,
-  Platform,
   Vibration,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 import * as Notifications from "expo-notifications";
-import { SafeAreaView, SafeAreaProvider } from "react-native-safe-area-context";
 import { registerForPushNotificationsAsync } from "@/utilities/notification/notification";
+
+type NotificationButtonProps = {
+  inDestinationLocation: boolean;
+};
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,7 +21,9 @@ Notifications.setNotificationHandler({
   }),
 });
 
-export default function NotificationButton() {
+export default function NotificationButton(props: NotificationButtonProps) {
+  const { inDestinationLocation } = props;
+
   const [isVibrating, setIsVibrating] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -45,6 +48,21 @@ export default function NotificationButton() {
     };
   }, []);
 
+  useEffect(() => {
+    if (inDestinationLocation) {
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: "MY KING",
+          body: "BRYAN",
+        },
+        trigger: {
+          seconds: 1,
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        },
+      });
+    }
+  }, [inDestinationLocation]);
+
   const triggerCallVibration = () => {
     const VIBRATION_INTERVAL = 500;
 
@@ -66,59 +84,32 @@ export default function NotificationButton() {
   };
 
   return (
-    <SafeAreaProvider style={styles.container}>
-      <SafeAreaView>
-        <Button
-          title="Send Local Notification"
-          onPress={async () => {
-            await Notifications.scheduleNotificationAsync({
-              content: {
-                title: "MY KING",
-                body: "BRYAN",
-              },
-              trigger: {
-                seconds: 1,
-                type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-              },
-            });
-          }}
-        />
-        <Separator />
-        {isVibrating && <View style={styles.notificationButtonContainer}>
+    <View style={styles.container}>
+      {isVibrating ? (
+        <View style={styles.notificationButtonContainer}>
           <TouchableOpacity
-            style={styles.stopButton}
+            style={styles.notificationButton}
             onPress={() => stopVibration()}
           >
             <Text style={styles.buttonText}>Stop Vibration</Text>
           </TouchableOpacity>
-        </View>}
-      </SafeAreaView>
-    </SafeAreaProvider>
+        </View>
+      ) : null}
+    </View>
   );
 }
 
-const Separator = () => {
-  return <View style={Platform.OS === "android" ? styles.separator : null} />;
-};
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 8,
-    maxHeight: 200
-  },
-  separator: {
-    marginVertical: 8,
-    borderBottomColor: "#737373",
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    position: "absolute",
+    width: "100%",
   },
   notificationButtonContainer: {
-    flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center', 
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  stopButton: {
+  notificationButton: {
     backgroundColor: "white",
     padding: 15,
     borderRadius: 8,
