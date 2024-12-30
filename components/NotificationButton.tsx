@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import * as Notifications from "expo-notifications";
+import { widthPercentageToDP as screenWidthPercentage } from "react-native-responsive-screen";
 import { registerForPushNotificationsAsync } from "@/utilities/notification/notification";
 
 type NotificationButtonProps = {
@@ -52,8 +53,8 @@ export default function NotificationButton(props: NotificationButtonProps) {
     if (inDestinationLocation) {
       Notifications.scheduleNotificationAsync({
         content: {
-          title: "MY KING",
-          body: "BRYAN",
+          title: "Destination Alert",
+          body: "You are about to arrive at your destination. Please prepare to exit.",
         },
         trigger: {
           seconds: 1,
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     borderRadius: 8,
-    width: 200,
+    width: screenWidthPercentage("25%"),
     alignItems: "center",
   },
   buttonText: {

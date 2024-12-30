@@ -3,15 +3,18 @@ import { OpenCageApiResponse } from "@/types/open-cage-api";
 import { constructLocationObjectFromOpenCageAPI } from "@/utilities/user-destination/user-destination-adapter";
 import { fetchGeoSearchResults } from "@/utilities/user-destination/user-destination-search-query";
 import React, { FunctionComponent, useContext, useEffect, useState } from "react";
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useDebounce } from "@uidotdev/usehooks";
+import {
+  widthPercentageToDP as screenWidthPercentage,
+  heightPercentageToDP as screenHeightPercentage,
+} from "react-native-responsive-screen";
 
 type SearchQueryResultsProps = {
   searchQuery: string;
   setSearchQuery: (searchQuery: string) => void;
 };
 
-const ScreenWidth = Dimensions.get("window").width;
 const ERROR_CODE = 400;
 
 const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
@@ -27,7 +30,7 @@ const RenderSeachQueryResults = ({ queryResultData, handlePress }: any) => {
           onPress={() => handlePress(openCageApiResponse)}
         >
           <Text style={styles.searchBarResultsItem}>
-            {openCageApiResponse.formatted}
+            {index + 1}. {openCageApiResponse.formatted}
           </Text>
         </TouchableOpacity>
       );
@@ -73,22 +76,21 @@ const SearchQueryResults:FunctionComponent<SearchQueryResultsProps> = ({searchQu
 const styles = StyleSheet.create({
   searchBarResults: {
     alignItems: "center",
-    minWidth: ScreenWidth * 0.9,
-    maxWidth: ScreenWidth * 0.9,
+    minWidth: screenWidthPercentage("90%"),
+    maxWidth: screenWidthPercentage("90%"),
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
     padding: 8,
     backgroundColor: "#fff",
-    maxHeight: 200,
+    maxHeight: screenHeightPercentage("25%"),
   },
   searchBarResultsItem: {
     borderWidth: 1,
     padding: 8,
-    borderRadius: 8,
     margin: 4,
-    minWidth: ScreenWidth * 0.7,
-    maxWidth: ScreenWidth * 0.7,
+    minWidth: screenWidthPercentage("80%"),
+    maxWidth: screenWidthPercentage("80%"),
   }
 });
 

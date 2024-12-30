@@ -61,11 +61,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
-    paddingTop: 44,
-    padding: 8,
   },
   map: {
     width: "100%",
     height: "100%",
+    alignItems: "center",
   },
 });

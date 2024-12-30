@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TextInput, Dimensions, Text } from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
+import {
+  widthPercentageToDP as screenWidthPercentage,
+  heightPercentageToDP as screenHeightPercentage,
+} from "react-native-responsive-screen";
 import SearchQueryResults from "./SearchQueryResults";
 
-const ScreenWidth = Dimensions.get("window").width;
 const SearchMenu = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -25,14 +28,15 @@ const SearchMenu = () => {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    justifyContent: "center",
+    position: "absolute",
     zIndex: 3,
-    width: ScreenWidth * 0.9,
+    width: screenWidthPercentage("90%"),
   },
   searchBar: {
-    maxWidth: ScreenWidth * 0.9,
-    minWidth: ScreenWidth * 0.9,
-    marginTop: 60,
+    maxWidth: screenWidthPercentage("90%"),
+    minWidth: screenWidthPercentage("90%"),
+    marginTop: screenHeightPercentage("7%"),
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
