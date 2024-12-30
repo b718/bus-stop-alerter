@@ -34,7 +34,10 @@ export default function HomeScreen() {
           setInDestinationLocation(true);
         }
       }, 1000);
-      return () => clearInterval(inDestinationLocationRange);
+      return () => {
+        clearInterval(inDestinationLocationRange);
+        setInDestinationLocation(false);
+      };
     }
   }, [destinationLocation]);
 
@@ -52,7 +55,7 @@ export default function HomeScreen() {
           )}
         />
       </MapView>
-      <NotificationButton inDestinationLocation={inDestinationLocation}/>
+      <NotificationButton inDestinationLocation={inDestinationLocation} />
     </View>
   );
 }
