@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 15,
     borderRadius: 8,
-    width: screenWidthPercentage("25%"),
+    width: screenWidthPercentage("50%"),
     alignItems: "center",
   },
   buttonText: {
