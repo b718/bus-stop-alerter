@@ -13,30 +13,19 @@ import NotificationButton from "@/components/NotificationButton";
 
 export default function HomeScreen() {
   const { destinationLocation } = useContext(DestinationLocationContext);
-  const [location, setLocation] = useState<Location.LocationObject | null>(
-    null
-  );
-  const [inDestinationLocation, setInDestinationLocation] =
-    useState<boolean>(false);
+  const [inDestinationLocation, setInDestinationLocation] = useState<boolean>(false);
   useEffect(() => {
-    getUserCurrentLocation(setLocation);
-  }, []);
-  useEffect(() => {
-    if (location && destinationLocation) {
-      const inDestinationLocation = 1000;
-      const inDestinationLocationRange = setInterval(() => {
-        if (
-          calculateDistanceBetweenUserAndDestination(
-            location,
-            destinationLocation
-          ) < inDestinationLocation
-        ) {
+    if (destinationLocation) {
+      const inDestinationLocation = 500;
+      const intervalToReTriggerCalculation = 2000;
+      const inDestinationLocationRange = setInterval(async () => {
+        const currentLocation = await getUserCurrentLocation();
+        if (currentLocation && calculateDistanceBetweenUserAndDestination(currentLocation, destinationLocation) < inDestinationLocation) {
           setInDestinationLocation(true);
         }
-      }, 1000);
+      }, intervalToReTriggerCalculation);
       return () => {
         clearInterval(inDestinationLocationRange);
-        setInDestinationLocation(false);
       };
     }
   }, [destinationLocation]);

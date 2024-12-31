@@ -1,15 +1,15 @@
 import * as Location from "expo-location";
 import { getPreciseDistance } from 'geolib';
 
-export async function getUserCurrentLocation(setLocation: (location: Location.LocationObject) => void) {
+export async function getUserCurrentLocation() {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") {
     console.log("Permission to access location was denied");
     return;
   }
 
-  const location = await Location.getCurrentPositionAsync({});
-  setLocation(location);
+  const currentLocation = await Location.getCurrentPositionAsync({});
+  return currentLocation;
 }
 
 export function calculateDistanceBetweenUserAndDestination(userLocation: Location.LocationObject, destinationLocation: Location.LocationObject) {
