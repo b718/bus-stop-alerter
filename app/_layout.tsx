@@ -15,7 +15,7 @@ import ReactQueryProvider from "@/components/ReactQueryProvider";
 
 export const DestinationLocationContext = createContext({
   destinationLocation: null as Location.LocationObject | null,
-  setDestinationLocation: (location: Location.LocationObject) => {},
+  setDestinationLocation: (location: Location.LocationObject | null) => {},
 });
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.

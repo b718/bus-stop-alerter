@@ -16,5 +16,6 @@ export function calculateDistanceBetweenUserAndDestination(userLocation: Locatio
   const userCoordinates = {latitude: userLocation.coords.latitude, longitude: userLocation.coords.longitude};
   const destinationCoordinates = {latitude: destinationLocation.coords.latitude, longitude: destinationLocation.coords.longitude};
   const distanceBetweenUserAndDestination = getPreciseDistance(userCoordinates, destinationCoordinates)
+  console.log("Distance between user and destination: ", distanceBetweenUserAndDestination);
   return distanceBetweenUserAndDestination;
 }

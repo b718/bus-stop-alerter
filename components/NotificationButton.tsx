@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Text,
   View,
@@ -9,9 +9,11 @@ import {
 import * as Notifications from "expo-notifications";
 import { widthPercentageToDP as screenWidthPercentage } from "react-native-responsive-screen";
 import { registerForPushNotificationsAsync } from "@/utilities/notification/notification";
+import { DestinationLocationContext } from "@/app/_layout";
 
 type NotificationButtonProps = {
   inDestinationLocation: boolean;
+  setInDestinationLocation: (inDestinationLocation: boolean) => void;
 };
 
 Notifications.setNotificationHandler({
@@ -23,7 +25,8 @@ Notifications.setNotificationHandler({
 });
 
 export default function NotificationButton(props: NotificationButtonProps) {
-  const { inDestinationLocation } = props;
+  const { inDestinationLocation, setInDestinationLocation } = props;
+  const { setDestinationLocation } = useContext(DestinationLocationContext);
 
   const [isVibrating, setIsVibrating] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -81,6 +84,8 @@ export default function NotificationButton(props: NotificationButtonProps) {
       intervalRef.current = null;
       Vibration.cancel();
       setIsVibrating(false);
+      setDestinationLocation(null);
+      setInDestinationLocation(false);
     }
   };
 

@@ -44,7 +44,7 @@ export default function HomeScreen() {
           )}
         />
       </MapView>
-      <NotificationButton inDestinationLocation={inDestinationLocation} />
+      <NotificationButton inDestinationLocation={inDestinationLocation} setInDestinationLocation={setInDestinationLocation} />
     </View>
   );
 }
